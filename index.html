@@ -1,69 +1,53 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novix Medical - دكتور محسن</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Novix Medical</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
 </head>
+
 <body class="dark-mode">
 
-    <div id="user-profile-menu" class="user-profile-wrapper">
-        <div class="profile-icon" onclick="toggleMenu()">
-            <span id="user-initials">M</span>
-        </div>
-        <div id="drop-menu" class="dropdown-content">
-            <p id="user-display-name" class="user-email-label"></p>
-            <button onclick="toggleDarkMode()" class="menu-btn">
-                <span id="mode-icon">☀️</span> <span id="mode-text">الوضع المضيء</span>
-            </button>
-            <button onclick="switchAccount()" class="menu-btn">🔄 تبديل الحساب</button>
-            <button onclick="signOut()" class="menu-btn logout-btn">📤 تسجيل الخروج</button>
+<div id="auth-overlay" class="overlay">
+    <button id="login-btn">تسجيل الدخول</button>
+</div>
+
+<div class="container">
+
+    <h2>Novix AI</h2>
+
+    <input type="file" id="fileInput">
+
+    <div id="loading-area" style="display:none;">جاري التحليل...</div>
+
+    <div id="main-content" style="display:none;">
+        <div id="dynamic-tab"></div>
+        <div id="terms-tab"></div>
+        <div id="quiz-tab"></div>
+
+        <!-- Chat -->
+        <div class="chat-box">
+            <input id="chatInput" placeholder="اسأل عن المحاضرة">
+            <button onclick="askAI()">إرسال</button>
+            <div id="chatOutput"></div>
         </div>
     </div>
 
-    <div id="auth-overlay" class="overlay">
-        <div class="login-card">
-            <h1 class="brand-logo">Novix Medical</h1>
-            <p>أهلاً بك دكتور محسن.. يرجى الدخول</p>
-            <button id="login-btn" class="btn-primary">الدخول بواسطة Google</button>
-        </div>
-    </div>
+</div>
 
-    <div class="container" id="app-container">
-        <header class="main-header">
-            <h2 class="brand-title">Novix <span>AI</span></h2>
-            <p class="subtitle">مساعدك الذكي في تحليل المحاضرات الطبية</p>
-        </header>
+<script src="script.js"></script>
 
-        <div class="upload-section">
-            <label for="fileInput" class="upload-label">
-                <div class="upload-icon">📄</div>
-                <p>ارفع المحاضرة الطبية (صورة أو PDF)</p>
-                <input type="file" id="fileInput" hidden accept="image/*,.pdf">
-            </label>
-        </div>
-
-        <div id="loading-area" class="loading-box" style="display: none;">
-            <div class="spinner"></div>
-            <p id="dhikr-text">"يا حي يا قيوم برحمتك أستغيث"</p>
-        </div>
-
-        <main id="main-content" style="display: none;">
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('dynamic')">الشرح</button>
-                <button class="tab-btn" onclick="switchTab('terms')">المصطلحات</button>
-                <button class="tab-btn" onclick="switchTab('quiz')">اختبار</button>
-            </div>
-            <div id="dynamic-tab" class="tab-pane active content-render"></div>
-            <div id="terms-tab" class="tab-pane content-render"></div>
-            <div id="quiz-tab" class="tab-pane content-render"></div>
-        </main>
-    </div>
-
-    <script src="script.js"></script>
 </body>
 </html>
