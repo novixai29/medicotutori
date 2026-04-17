@@ -4,58 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Med Tutorial | صدقة جارية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body class="light-mode">
+<body>
+
     <div id="auth-overlay" class="overlay">
         <div class="auth-card">
-            <h2>🩺 Med Tutorial</h2>
-            <p>السلام عليكم، هذا الموقع مجاني كصدقة جارية لأرواح أموات المسلمين جميعاً</p>
-            <button id="login-btn" class="btn-primary">الدخول بحساب Google</button>
+            <h1 style="color: var(--primary); margin-bottom: 10px;">🩺 Med Tutorial</h1>
+            <p style="color: #666; margin-bottom: 25px;">مرحباً بك دكتور، هذا الموقع صدقة جارية مخصصة لطلاب الطب لتسهيل دراسة المحاضرات.</p>
+            <button id="login-btn" class="btn-primary">تسجيل الدخول عبر Google</button>
         </div>
     </div>
 
     <nav>
         <div class="nav-container">
-            <span class="logo">Med Tutorial</span>
-            <button id="theme-toggle">🌙</button>
+            <span class="logo">MED TUTORIAL</span>
+            <div id="user-info" style="color: white; font-size: 0.9rem;"></div>
         </div>
     </nav>
 
     <div class="container">
-        <section id="admin-panel" class="card" style="display:none; border-right: 5px solid #ff8c00;">
-            <h3>🛡️ لوحة الإدارة (د. محسن المجيدي)</h3>
+        <section id="admin-panel" class="card" style="display:none; background: #fffcf0;">
+            <h3 style="color: #e67e22; margin-top: 0;">🛡️ لوحة التحكم (د. محسن)</h3>
+            <p id="users-count" style="font-size: 0.9rem;">أهلاً بك في نظامك الخاص.</p>
         </section>
 
         <section class="upload-section card">
-            <div id="drop-zone" class="drop-zone">
+            <div id="drop-zone" class="drop-zone" onclick="document.getElementById('fileInput').click()">
                 <input type="file" id="fileInput" hidden accept=".pdf,image/*">
-                <span style="font-size: 40px;">📥</span>
-                <h3>ارفع المحاضرة الطبية</h3>
-                <button class="btn-orange" onclick="document.getElementById('fileInput').click()">اختيار الملف</button>
+                <div class="upload-icon" style="font-size: 50px; margin-bottom: 15px;">📄</div>
+                <h3 style="margin: 0;">اضغط هنا لرفع المحاضرة</h3>
+                <p style="color: #888; font-size: 0.9rem; margin-top: 10px;">يدعم ملفات PDF والصور الطبية</p>
             </div>
-            <div id="loading-area" style="display:none; text-align: center; padding: 20px;">
-                <p style="color: #ff8c00; font-weight: bold;">المسألة ما تطول، اذكر الله علما نكمل</p>
-                <div id="dhikr-text" style="font-size: 1.2rem; margin-top: 10px;">"سبحان الله وبحمده"</div>
+            
+            <div id="loading-area" style="display:none;">
+                <div class="dhikr-box" id="dhikr-text">"يا حي يا قيوم برحمتك أستغيث"</div>
+                <p style="text-align: center; color: var(--primary); font-weight: bold;">جاري تحليل المحاضرة طبياً بذكاء Gemini...</p>
             </div>
         </section>
 
         <main id="main-content" style="display:none;">
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('explanation')">شرح المحاضرة</button>
-                <button class="tab-btn" onclick="switchTab('terms')">المصطلحات</button>
-                <button class="tab-btn" onclick="switchTab('quiz')">اختبار MCQ</button>
+                <button class="tab-btn active" onclick="switchTab('explanation')">💡 الشرح التفصيلي</button>
+                <button class="tab-btn" onclick="switchTab('terms')">📖 المصطلحات</button>
+                <button class="tab-btn" onclick="switchTab('quiz')">📝 اختبار MCQ</button>
             </div>
-            <div id="explanation-tab" class="tab-pane active"><div id="dynamic-content"></div></div>
-            <div id="terms-tab" class="tab-pane card"></div>
-            <div id="quiz-tab" class="tab-pane card"></div>
+
+            <div id="explanation-tab" class="tab-pane active card">
+                <div id="dynamic-content">
+                    </div>
+            </div>
+
+            <div id="terms-tab" class="tab-pane card">
+                </div>
+
+            <div id="quiz-tab" class="tab-pane card">
+                </div>
         </main>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
