@@ -15,28 +15,25 @@
             <span id="user-initials">M</span>
         </div>
         <div id="drop-menu" class="dropdown-content">
-            <p id="user-display-name"></p>
-            <hr>
-            <div class="menu-row">
-                <button onclick="toggleDarkMode()" title="تبديل الوضع الليلي">
-                    <span id="mode-icon">☀️</span> الوضع المضيء
-                </button>
-            </div>
-            <button onclick="switchAccount()">🔄 تبديل الحساب</button>
-            <button onclick="signOut()" class="logout-btn">📤 تسجيل الخروج</button>
+            <p id="user-display-name" class="user-email-label"></p>
+            <button onclick="toggleDarkMode()" class="menu-btn">
+                <span id="mode-icon">☀️</span> <span id="mode-text">الوضع المضيء</span>
+            </button>
+            <button onclick="switchAccount()" class="menu-btn">🔄 تبديل الحساب</button>
+            <button onclick="signOut()" class="menu-btn logout-btn">📤 تسجيل الخروج</button>
         </div>
     </div>
 
     <div id="auth-overlay" class="overlay">
         <div class="login-card">
-            <h1 style="color: #ff9800;">Novix Medical</h1>
-            <p>مرحباً بك دكتور.. يرجى تسجيل الدخول للبدء</p>
+            <h1 class="brand-logo">Novix Medical</h1>
+            <p>أهلاً بك دكتور محسن.. يرجى الدخول</p>
             <button id="login-btn" class="btn-primary">الدخول بواسطة Google</button>
         </div>
     </div>
 
     <div class="container" id="app-container">
-        <header>
+        <header class="main-header">
             <h2 class="brand-title">Novix <span>AI</span></h2>
             <p class="subtitle">مساعدك الذكي في تحليل المحاضرات الطبية</p>
         </header>
@@ -44,25 +41,25 @@
         <div class="upload-section">
             <label for="fileInput" class="upload-label">
                 <div class="upload-icon">📄</div>
-                <span>ارفع المحاضرة (صورة أو PDF)</span>
+                <p>ارفع المحاضرة الطبية (صورة أو PDF)</p>
                 <input type="file" id="fileInput" hidden accept="image/*,.pdf">
             </label>
         </div>
 
         <div id="loading-area" class="loading-box" style="display: none;">
             <div class="spinner"></div>
-            <p id="dhikr-text">جاري التحليل.. اذكر الله</p>
+            <p id="dhikr-text">"يا حي يا قيوم برحمتك أستغيث"</p>
+            <p class="loading-sub">جاري تحليل المحاضرة طبياً بذكاء Gemini...</p>
         </div>
 
         <main id="main-content" style="display: none;">
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('dynamic')">الشرح</button>
+                <button class="tab-btn active" onclick="switchTab('dynamic')">الشرح الطبي</button>
                 <button class="tab-btn" onclick="switchTab('terms')">المصطلحات</button>
-                <button class="tab-btn" onclick="switchTab('quiz')">الاختبار</button>
+                <button class="tab-btn" onclick="switchTab('quiz')">اختبار MCQ</button>
             </div>
-            <div id="dynamic-tab" class="tab-pane active">
-                <div id="dynamic-content" class="content-render"></div>
-            </div>
+            
+            <div id="dynamic-tab" class="tab-pane active content-render"></div>
             <div id="terms-tab" class="tab-pane content-render"></div>
             <div id="quiz-tab" class="tab-pane content-render"></div>
         </main>
