@@ -3,76 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Med Tutorial | زميلك في الدراسة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>Med Tutorial | صدقة جارية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="importmap">
+      { "imports": { "@google/generative-ai": "https://esm.run/@google/generative-ai" } }
+    </script>
 </head>
 <body class="light-mode">
+    <div id="auth-overlay" class="overlay">
+        <div class="auth-card">
+            <h2>🩺 Med Tutorial</h2>
+            <p>السلام عليكم، هذا الموقع مجاني كصدقة جارية لأرواح أموات المسلمين جميعاً</p>
+            <button id="login-btn" class="btn-primary">الدخول بحساب Google</button>
+        </div>
+    </div>
 
-    <nav class="navbar">
-        <div class="logo">Med Tutorial</div>
-        <div class="nav-links">
-            <button id="theme-toggle" class="btn-icon"><i class="fas fa-moon"></i></button>
-            <button id="login-btn" class="btn-primary">تسجيل الدخول بجوجل</button>
-            <div id="user-info" class="hidden">
-                <span id="user-name"></span>
-                <button id="logout-btn" class="btn-outline">خروج</button>
+    <nav>
+        <div class="nav-container">
+            <span class="logo">Med Tutorial</span>
+            <div class="nav-btns">
+                <button id="theme-toggle">🌙</button>
+                <button id="logout-btn" style="display:none;">خروج</button>
             </div>
         </div>
     </nav>
 
-    <header class="hero">
-        <p class="sadaqa-msg">السلام عليكم، هذا الموقع مجاني كصدقة جارية لأرواح اموات المسلمين جميعاً</p>
-        <h1>اشرح مادتك.. كأننا كاعدين سوة</h1>
-    </header>
-
-    <main class="container">
-        <section id="admin-panel" class="hidden card">
-            <h3><i class="fas fa-user-shield"></i> لوحة الإدارة (خاص بالدكتور محسن)</h3>
-            <div id="users-list"></div>
+    <div class="container">
+        <section id="admin-panel" class="card admin-box" style="display:none;">
+            <h3>🛡️ لوحة الإدارة (د. محسن المجيدي)</h3>
+            <div id="users-count">جاري التحميل...</div>
         </section>
 
         <section class="upload-section card">
-            <div class="drop-zone" id="drop-zone">
-                <i class="fas fa-file-medical-alt fa-3x"></i>
-                <p>اسحب ملف المحاضرة هنا أو اضغط للرفع</p>
-                <input type="file" id="file-input" hidden>
-            </div>
-            <button id="process-btn" class="btn-primary full-width">ابدأ الشرح الذكي</button>
-        </section>
-
-        <section id="loading-area" class="hidden card text-center">
-            <div class="loader"></div>
-            <p class="wait-msg">المسألة ما تطول، اذكر الله علما نكمل و الله يوفقك</p>
-            <div id="dhikr-display" class="dhikr-style"></div>
-        </section>
-
-        <section id="result-area" class="hidden">
-            <div class="tabs">
-                <button class="tab-btn active" onclick="showTab('explanation')">الشرح</button>
-                <button class="tab-btn" onclick="showTab('terms')">المصطلحات</button>
-                <button class="tab-btn" onclick="showTab('quizzes')">اختبارات MCQ</button>
-            </div>
-
-            <div id="explanation" class="tab-content active">
-                <div id="previous-review" class="review-box"></div>
-                <div id="main-explanation"></div>
+            <div id="drop-zone" class="drop-zone">
+                <input type="file" id="fileInput" hidden accept=".pdf,image/*">
+                <span class="upload-icon">📤</span>
+                <h3>ارفع المحاضرة (PDF أو صور)</h3>
+                <button class="btn-orange" onclick="document.getElementById('fileInput').click()">اختيار الملف</button>
             </div>
             
-            <div id="terms" class="tab-content"></div>
-            <div id="quizzes" class="tab-content"></div>
+            <div id="loading-area" style="display:none;">
+                <p class="dhikr-msg">المسألة ما تطول، اذكر الله علما نكمل و الله يوفقك</p>
+                <div id="dhikr-text" class="dhikr-box">"سبحان الله وبحمده"</div>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
         </section>
+
+        <main id="main-content" style="display:none;">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('explanation')">الشرح المباشر</button>
+                <button class="tab-btn" onclick="switchTab('terms')">المصطلحات</button>
+                <button class="tab-btn" onclick="switchTab('quiz')">اختبارات الذكاء</button>
+            </div>
+
+            <div id="explanation-tab" class="tab-pane active">
+                <div id="prev-review" class="review-box"></div>
+                <div id="dynamic-content"></div>
+            </div>
+            <div id="terms-tab" class="tab-pane card"></div>
+            <div id="quiz-tab" class="tab-pane card"></div>
+        </main>
 
         <section class="history-section card">
-            <h3><i class="fas fa-history"></i> سجل محاضراتك السابقة</h3>
+            <h3>📜 محاضراتك السابقة</h3>
             <ul id="history-list"></ul>
         </section>
-    </main>
-
-    <script src="script.js"></script>
+    </div>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
