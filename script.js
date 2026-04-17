@@ -12,7 +12,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 // الـ API Key الخاص بك (تم التحديث)
-const GEN_AI_KEY = "AQ.Ab8RN6L7brXBBgxip_nesN5GBNvX9lNX_lzuTxmP9SDrEJ4nWA"; 
+const GEN_AI_KEY = "AQ.Ab8RN6L16z_vTgevV3WwjKyscALSUUA-Qkcc5o5ojbgqnmOcQg"; 
 
 // --- نظام الوضع الليلي الذكي ---
 function toggleDarkMode() {
