@@ -10,35 +10,22 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// دكتور: هذا المفتاح جديد، إذا توقف، يرجى استبداله من Google AI Studio
-const GEN_AI_KEY = "AIzaSyDArjn0nr-qG9XxH3UHI5UDu-6cLs6jM_M"; // ملاحظة: هذا مثال، تأكد من وضع المفتاح الفعال لديك
+// دكتور: استبدل هذا بالمفتاح الفعال من Google AI Studio
+const GEN_AI_KEY = "AQ.Ab8RN6LxuTogXc4uFltYsMEAOU7W4dmL3tNvgPifzth3BwhXCw"; 
 
-// --- نظام الوضع الليلي ---
 function toggleDarkMode() {
     const body = document.body;
-    const modeIcon = document.getElementById('mode-icon');
-    const modeText = document.getElementById('mode-text');
-
-    if (body.classList.contains('dark-mode')) {
-        body.classList.remove('dark-mode');
-        modeIcon.innerText = "🌙";
-        modeText.innerText = "الوضع الليلي";
-        localStorage.setItem('theme', 'light');
-    } else {
-        body.classList.add('dark-mode');
-        modeIcon.innerText = "☀️";
-        modeText.innerText = "الوضع المضيء";
-        localStorage.setItem('theme', 'dark');
-    }
+    const isDark = body.classList.toggle('dark-mode');
+    document.getElementById('mode-icon').innerText = isDark ? "☀️" : "🌙";
+    document.getElementById('mode-text').innerText = isDark ? "الوضع المضيء" : "الوضع الليلي";
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
-// تطبيق الثيم المختار سابقاً
 if (localStorage.getItem('theme') === 'light') {
     document.body.classList.remove('dark-mode');
     document.getElementById('mode-icon').innerText = "🌙";
 }
 
-// --- إدارة واجهة المستخدم ---
 function toggleMenu() {
     const menu = document.getElementById('drop-menu');
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
@@ -46,8 +33,7 @@ function toggleMenu() {
 
 function switchAccount() {
     const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    auth.signInWithPopup(provider);
+    auth.signInWithPopup(provider).catch(() => auth.signInWithRedirect(provider));
 }
 
 function signOut() { auth.signOut().then(() => location.reload()); }
@@ -68,7 +54,6 @@ document.getElementById('login-btn').onclick = () => {
     auth.signInWithPopup(provider).catch(() => auth.signInWithRedirect(provider));
 };
 
-// --- تحليل المحاضرة ---
 document.getElementById('fileInput').onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -78,32 +63,27 @@ document.getElementById('fileInput').onchange = async (e) => {
 
     try {
         const base64 = await toBase64(file);
-        // ملاحظة: الرابط أدناه يتطلب API Key صالح
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEN_AI_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [
-                    { text: "أنت بروفيسور طبي. اشرح المحاضرة بالتفصيل، اذكر الأدوية العراقية، المصطلحات، ثم كويز MCQ. افصل بـ ###" },
+                    { text: "أنت بروفيسور طبي خبير. اشرح المحاضرة المرفقة بالتفصيل، اذكر الأدوية العراقية المتاحة، قائمة المصطلحات، وكويز MCQ. افصل الأقسام بكلمة ###" },
                     { inlineData: { data: base64, mimeType: file.type } }
                 ]}]
             })
         });
 
         const data = await response.json();
-        if (data.error) throw new Error(data.error.message);
-
         const text = data.candidates[0].content.parts[0].text;
         const sections = text.split('###');
 
         document.getElementById('dynamic-tab').innerHTML = marked.parse(sections[0] || "");
-        document.getElementById('terms-tab').innerHTML = marked.parse(sections[1] || "لا توجد مصطلحات");
-        document.getElementById('quiz-tab').innerHTML = marked.parse(sections[2] || "لا يوجد اختبار");
-
+        document.getElementById('terms-tab').innerHTML = marked.parse(sections[1] || "");
+        document.getElementById('quiz-tab').innerHTML = marked.parse(sections[2] || "");
         document.getElementById('main-content').style.display = 'block';
     } catch (err) {
-        alert("تنبيه دكتور: هناك مشكلة في مفتاح الذكاء الاصطناعي أو حجم الملف. يرجى التأكد من الـ API Key.");
-        console.error(err);
+        alert("تنبيه: تأكد من مفتاح الـ API Key في الكود.");
     } finally {
         document.getElementById('loading-area').style.display = 'none';
     }
