@@ -13,28 +13,51 @@ const API_URL = "http://localhost:3000";
 
 let lastLecture = "";
 
-// login
+// تسجيل الدخول
 document.getElementById('login-btn').onclick = ()=>{
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider);
 };
 
-// auth state
-auth.onAuthStateChanged(async user=>{
-    document.getElementById('auth-overlay').style.display = user ? 'none':'flex';
+// 🔥 منع استخدام الموقع بدون تسجيل
+auth.onAuthStateChanged(user => {
+    const overlay = document.getElementById('auth-overlay');
+    const app = document.querySelector('.container');
 
-    if(user){
-        const snapshot = await db.collection("lectures")
-        .where("uid","==",user.uid)
-        .get();
-
-        snapshot.forEach(doc=>{
-            console.log("محفوظ:", doc.data());
-        });
+    if (user) {
+        overlay.style.display = 'none';
+        app.style.display = 'block';
+    } else {
+        overlay.style.display = 'flex';
+        app.style.display = 'none';
     }
 });
 
-// file upload
+// 🕌 الأذكار
+const adhkar = [
+"سبحان الله",
+"الحمد لله",
+"الله أكبر",
+"لا إله إلا الله",
+"استغفر الله",
+"لا حول ولا قوة إلا بالله"
+];
+
+let dhikrInterval;
+
+function startDhikr(){
+    const el = document.getElementById("dhikr-text");
+
+    dhikrInterval = setInterval(()=>{
+        el.innerText = adhkar[Math.floor(Math.random()*adhkar.length)];
+    },2000);
+}
+
+function stopDhikr(){
+    clearInterval(dhikrInterval);
+}
+
+// رفع الملف
 document.getElementById('fileInput').onchange = handleFile;
 
 async function handleFile(e){
@@ -42,41 +65,52 @@ async function handleFile(e){
     if(!file) return;
 
     document.getElementById('loading-area').style.display='block';
+    document.getElementById('main-content').style.display='none';
+
+    startDhikr(); // 🔥 تشغيل الأذكار
 
     const base64 = await toBase64(file);
 
-    const res = await fetch(API_URL+"/analyze",{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ base64, type:file.type })
-    });
-
-    const data = await res.json();
-
-    const text = data.text || "";
-    lastLecture = text;
-
-    const sections = text.split("###");
-
-    document.getElementById('dynamic-tab').innerHTML = marked.parse(sections[0]||"");
-    document.getElementById('terms-tab').innerHTML = marked.parse(sections[1]||"");
-    document.getElementById('quiz-tab').innerHTML = marked.parse(sections[2]||"");
-
-    document.getElementById('main-content').style.display='block';
-    document.getElementById('loading-area').style.display='none';
-
-    const user = auth.currentUser;
-
-    if(user){
-        await db.collection("lectures").add({
-            uid:user.uid,
-            text,
-            created:new Date()
+    try{
+        const res = await fetch(API_URL+"/analyze",{
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({ base64, type:file.type })
         });
+
+        const data = await res.json();
+
+        const text = data.text || "";
+        lastLecture = text;
+
+        const sections = text.includes("###") ? text.split("###") : [text];
+
+        document.getElementById('dynamic-tab').innerHTML = marked.parse(sections[0]||"");
+        document.getElementById('terms-tab').innerHTML = marked.parse(sections[1]||"");
+        document.getElementById('quiz-tab').innerHTML = marked.parse(sections[2]||"");
+
+        document.getElementById('main-content').style.display='block';
+
+        // حفظ في Firestore
+        const user = auth.currentUser;
+        if(user){
+            await db.collection("lectures").add({
+                uid:user.uid,
+                text,
+                created:new Date()
+            });
+        }
+
+    }catch(err){
+        alert("خطأ في التحليل");
+        console.error(err);
     }
+
+    stopDhikr(); // 🔥 إيقاف الأذكار
+    document.getElementById('loading-area').style.display='none';
 }
 
-// chat
+// Chat
 async function askAI(){
     const question = document.getElementById("chatInput").value;
 
@@ -92,7 +126,7 @@ async function askAI(){
         marked.parse(data.reply);
 }
 
-// base64
+// Base64
 const toBase64 = f => new Promise((res,rej)=>{
     const r = new FileReader();
     r.readAsDataURL(f);
