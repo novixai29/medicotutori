@@ -1,81 +1,76 @@
-// حالة المستخدم (مبنية على ملف useUserStore.ts الذي أرسلته)
-let userStats = JSON.parse(localStorage.getItem('med_student_stats')) || {
-    totalQuizzes: 0,
-    averageScore: 0,
-    level: 'Beginner',
-    pastLectures: [],
-    dialect: 'Iraqi'
+// 🌙 Dark Mode
+darkModeToggle.onclick = () => {
+  document.body.classList.toggle("dark");
 };
 
-// تحديث الواجهة عند البداية
-function init() {
-    updateUI();
-    setupUploader();
+// Firebase
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// Login
+loginBtn.onclick = () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider);
+};
+
+auth.onAuthStateChanged(user => {
+  if(user) userInfo.innerText = user.email;
+});
+
+// Tabs
+function showTab(tab){
+  document.querySelectorAll(".tabContent").forEach(e=>e.classList.add("hidden"));
+  document.getElementById(tab).classList.remove("hidden");
 }
 
-function updateUI() {
-    document.getElementById('avg-score').innerText = `${Math.round(userStats.averageScore)}%`;
-    document.getElementById('total-quizzes').innerText = userStats.totalQuizzes;
-    document.getElementById('current-dialect').innerText = userStats.dialect === 'Iraqi' ? 'العراقية' : 'المصلاوية';
-    document.getElementById('user-level').innerText = userStats.level === 'Beginner' ? 'مبتدئ' : 'متقدم';
-    
-    const list = document.getElementById('lecture-list');
-    if (userStats.pastLectures.length > 0) {
-        list.innerHTML = userStats.pastLectures.map(l => `<li>✅ ${l.title}</li>`).join('');
-    }
+// Upload + AI
+uploadBtn.onclick = async () => {
+  const file = fileInput.files[0];
+  if(!file) return alert("اختر ملف");
+
+  loading.classList.remove("hidden");
+
+  const text = await file.text();
+
+  const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer YOUR_API_KEY"
+    },
+    body: JSON.stringify({
+      model:"gpt-4o-mini",
+      messages:[
+        {
+          role:"system",
+          content:"اشرح محاضرة طبية بالتفصيل مع تقسيم: تذكير، شرح، ادوية، فحوصات، مصطلحات، MCQ"
+        },
+        {
+          role:"user",
+          content:text
+        }
+      ]
+    })
+  });
+
+  const data = await aiResponse.json();
+  const output = data.choices[0].message.content;
+
+  displayResult(output);
+
+  loading.classList.add("hidden");
+};
+
+// عرض النتائج
+function displayResult(text){
+  tabs.classList.remove("hidden");
+
+  explain.innerHTML = text;
+  terms.innerHTML = "يتم استخراج المصطلحات هنا...";
+  mcq.innerHTML = "أسئلة MCQ تظهر هنا...";
 }
-
-function setupUploader() {
-    const fileInput = document.getElementById('fileInput');
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) handleFileUpload(file);
-    });
-}
-
-function handleFileUpload(file) {
-    // محاكاة معالجة الملف
-    document.getElementById('uploader-section').style.display = 'none';
-    document.getElementById('interaction-section').style.display = 'block';
-    
-    addMessage('bot', `أهلاً دكتور، قمت بتحليل ملف "${file.name}". شتريد أشرحلك منه بلهجتنا؟`);
-    
-    // حفظ في السجل
-    userStats.pastLectures.unshift({ title: file.name, date: Date.now() });
-    saveData();
-}
-
-function addMessage(sender, text) {
-    const container = document.getElementById('chat-messages');
-    const div = document.createElement('div');
-    div.className = `message ${sender}`;
-    div.innerText = text;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-}
-
-function askGemini() {
-    const input = document.getElementById('userQuery');
-    const query = input.value.trim();
-    if (!query) return;
-
-    addMessage('user', query);
-    input.value = '';
-
-    // هنا يتم الاتصال بـ API في المستقبل، حالياً محاكاة:
-    setTimeout(() => {
-        addMessage('bot', "هذا الجزء من المحاضرة جداً مهم، ويتلخص بـ...");
-    }, 1000);
-}
-
-function resetUploader() {
-    document.getElementById('uploader-section').style.display = 'block';
-    document.getElementById('interaction-section').style.display = 'none';
-}
-
-function saveData() {
-    localStorage.setItem('med_student_stats', JSON.stringify(userStats));
-    updateUI();
-}
-
-init();
