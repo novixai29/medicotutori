@@ -3,42 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>طبيب المستقبل | إدارة البيانات</title>
+    <title>طبيب المستقبل | الشرح الذكي</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🩺 لوحة تحكم طبيب المستقبل</h1>
+            <h1>🩺 طبيب المستقبل</h1>
             <div id="user-level" class="badge">مبتدئ</div>
         </header>
 
-        <main>
-            <section class="stats-grid">
-                <div class="stat-card">
-                    <h3>المعدل</h3>
-                    <p id="avg-score">0%</p>
-                </div>
-                <div class="stat-card">
-                    <h3>الاختبارات</h3>
-                    <p id="total-quizzes">0</p>
-                </div>
-                <div class="stat-card">
-                    <h3>اللهجة المختارة</h3>
-                    <p id="current-dialect">العراقية</p>
-                </div>
-            </section>
+        <section class="stats-grid">
+            <div class="stat-card"><h3>المعدل</h3><p id="avg-score">0%</p></div>
+            <div class="stat-card"><h3>الاختبارات</h3><p id="total-quizzes">0</p></div>
+            <div class="stat-card"><h3>اللهجة</h3><p id="current-dialect">العراقية</p></div>
+        </section>
 
-            <section class="action-zone">
-                <button onclick="changeDialect('Moslawi')">تحويل للهجة المصلاوية</button>
-                <button onclick="simulateUpload()" id="upload-btn">رفع محاضرة جديدة</button>
-            </section>
+        <div id="main-app">
+            <div id="drop-zone" class="uploader-area">
+                <div class="icon">📤</div>
+                <p>اسحب ملف المحاضرة (PDF) هنا</p>
+                <input type="file" id="fileInput" hidden accept=".pdf">
+                <button onclick="document.getElementById('fileInput').click()">اختر ملف</button>
+            </div>
 
-            <section class="history">
-                <h3>المحاضرات السابقة</h3>
-                <ul id="lecture-list"></ul>
-            </section>
-        </main>
+            <div id="explanation-area" style="display:none;">
+                <div class="chat-window" id="chat-window"></div>
+                <div class="input-group">
+                    <input type="text" id="userQuery" placeholder="اسأل عن أي شيء بالمحاضرة...">
+                    <button onclick="askGemini()">إرسال</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
