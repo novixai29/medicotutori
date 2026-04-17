@@ -1,76 +1,98 @@
-// 🌙 Dark Mode
-darkModeToggle.onclick = () => {
-  document.body.classList.toggle("dark");
-};
-
-// Firebase
+// اعدادات Firebase (يجب جلبها من console.firebase.google.com)
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
-// Login
-loginBtn.onclick = () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
-};
+const adminEmail = "musen.almajidi.alallaf@gmail.com";
 
-auth.onAuthStateChanged(user => {
-  if(user) userInfo.innerText = user.email;
+// الأذكار
+const adhkars = [
+    "اللهم انفعنا بما علمتنا وعلمنا ما ينفعنا",
+    "ربِّ زدني علماً",
+    "اللهم لا سهل إلا ما جعلته سهلاً",
+    "من سلك طريقاً يلتمس فيه علماً سهل الله له به طريقاً إلى الجنة"
+];
+
+// تبديل الوضع الليلي
+document.getElementById('theme-toggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const icon = document.querySelector('#theme-toggle i');
+    icon.classList.toggle('fa-sun');
 });
 
-// Tabs
-function showTab(tab){
-  document.querySelectorAll(".tabContent").forEach(e=>e.classList.add("hidden"));
-  document.getElementById(tab).classList.remove("hidden");
+// تسجيل الدخول
+document.getElementById('login-btn').addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).then(result => {
+        handleUser(result.user);
+    });
+});
+
+function handleUser(user) {
+    if (user) {
+        document.getElementById('login-btn').classList.add('hidden');
+        document.getElementById('user-info').classList.remove('hidden');
+        document.getElementById('user-name').innerText = user.displayName;
+        
+        // خزن البيانات محلياً
+        localStorage.setItem('medUser', JSON.stringify(user));
+
+        // التحقق من الأدمن
+        if (user.email === adminEmail) {
+            document.getElementById('admin-panel').classList.remove('hidden');
+            loadAdminData();
+        }
+    }
 }
 
-// Upload + AI
-uploadBtn.onclick = async () => {
-  const file = fileInput.files[0];
-  if(!file) return alert("اختر ملف");
+// محاكاة معالجة الملف والذكاء الاصطناعي
+document.getElementById('process-btn').addEventListener('click', () => {
+    document.getElementById('loading-area').classList.remove('hidden');
+    let dhikrIdx = 0;
+    
+    // تغيير الأذكار كل 10 ثواني
+    const dhikrInterval = setInterval(() => {
+        document.getElementById('dhikr-display').innerText = adhkars[dhikrIdx % adhkars.length];
+        dhikrIdx++;
+    }, 5000);
 
-  loading.classList.remove("hidden");
+    setTimeout(() => {
+        clearInterval(dhikrInterval);
+        document.getElementById('loading-area').classList.add('hidden');
+        document.getElementById('result-area').classList.remove('hidden');
+        renderMockExplanation();
+    }, 5000); // محاكاة لـ 5 ثواني
+});
 
-  const text = await file.text();
+function renderMockExplanation() {
+    const expDiv = document.getElementById('main-explanation');
+    const reviewDiv = document.getElementById('previous-review');
+    
+    reviewDiv.innerHTML = "<strong>تذكير بالمحاضرة السابقة:</strong><br>تكلمنا في المرة الماضية عن فزيولوجيا القلب وكيفية انتقال الشارة الكهربائية من الـ SA Node وصولاً للبطينات.. (تكملة 5 أسطر)";
+    
+    expDiv.innerHTML = `
+        <div class="explanation-segment">
+            <h3>1. البداية والأساسيات</h3>
+            <p>يا دكتور، الموضوع بسيط.. شوف هاي الصورة تشرح لك كيف الضغط يرتفع...</p>
+        </div>
+        <div class="explanation-segment">
+            <h3>2. الأدوية المذكورة</h3>
+            <p>الدواء المذكور هو <strong>Amlodipine</strong> واسمه التجاري المشهور (Norvasc).</p>
+        </div>
+    `;
+}
 
-  const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "Authorization":"Bearer YOUR_API_KEY"
-    },
-    body: JSON.stringify({
-      model:"gpt-4o-mini",
-      messages:[
-        {
-          role:"system",
-          content:"اشرح محاضرة طبية بالتفصيل مع تقسيم: تذكير، شرح، ادوية، فحوصات، مصطلحات، MCQ"
-        },
-        {
-          role:"user",
-          content:text
-        }
-      ]
-    })
-  });
-
-  const data = await aiResponse.json();
-  const output = data.choices[0].message.content;
-
-  displayResult(output);
-
-  loading.classList.add("hidden");
-};
-
-// عرض النتائج
-function displayResult(text){
-  tabs.classList.remove("hidden");
-
-  explain.innerHTML = text;
-  terms.innerHTML = "يتم استخراج المصطلحات هنا...";
-  mcq.innerHTML = "أسئلة MCQ تظهر هنا...";
+function showTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
 }
