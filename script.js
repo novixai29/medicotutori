@@ -1,4 +1,4 @@
-// 1. إعدادات Firebase المحدثة لمشروعك (medical-novix)
+// 1. إعدادات Firebase (مشروعك الجديد medical-novix)
 const firebaseConfig = {
   apiKey: "AIzaSyDArjn0nr-qG9XxH3UHI5UDu-6cLs6jM_M",
   authDomain: "medical-novix.firebaseapp.com",
@@ -9,13 +9,13 @@ const firebaseConfig = {
   measurementId: "G-LNV3SVPJWL"
 };
 
-// تهيئة Firebase (باستخدام النسخة المتوافقة مع المتصفح مباشرة)
+// تهيئة Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const ADMIN_EMAIL = "musen.almajidi.alallaf@gmail.com";
 
-// 2. مفتاح Gemini (الذي أرسلته دكتور)
+// 2. مفتاح Gemini API (الذي أرسلته دكتور)
 const GEN_AI_KEY = "AQ.Ab8RN6JqqfprCS0UwSvRNckttAJxQuhm06huJMMqabVxnTiw5w"; 
 
 // 3. قائمة الأذكار
@@ -23,33 +23,28 @@ const dhikrs = [
     "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ",
     "اللَّهُمَّ انْفَعْنِي بِمَا عَلَّمْتَنِي ، وَعَلِّمْنِي مَا يَنْفَعُنِي",
     "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
-    "رَبِّ زِدْنِي عِلْمًا"
+    "رَبِّ زِدْنِي عِلْمًا ، وَارْزُقْنِي فَهْمًا"
 ];
 
-// --- نظام تسجيل الدخول ---
+// --- نظام تسجيل الدخول (Redirect) ---
 const loginBtn = document.getElementById('login-btn');
-
 if (loginBtn) {
     loginBtn.onclick = () => {
         const provider = new firebase.auth.GoogleAuthProvider();
-        // نستخدم Popup هنا لتجربة الاستجابة السريعة
-        auth.signInWithPopup(provider).catch(err => {
-            console.error("خطأ في تسجيل الدخول:", err);
-            // إذا فشل الـ Popup (بسبب حظر الآيباد)، نستخدم الـ Redirect
-            auth.signInWithRedirect(provider);
-        });
+        auth.signInWithRedirect(provider);
     };
 }
 
+// مراقبة حالة المستخدم بعد العودة من Redirect
 auth.onAuthStateChanged(async (user) => {
     if (user) {
         document.getElementById('auth-overlay').style.display = 'none';
         
-        // حفظ بيانات الطالب
+        // تسجيل بيانات الطالب في Firestore
         await db.collection('users').doc(user.uid).set({
             name: user.displayName,
             email: user.email,
-            lastLogin: Date.now()
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
         if (user.email === ADMIN_EMAIL) {
@@ -60,59 +55,78 @@ auth.onAuthStateChanged(async (user) => {
     }
 });
 
-// --- معالجة المحاضرة ---
+// --- معالجة المحاضرة الطبية ---
 const fileInput = document.getElementById('fileInput');
-
 if (fileInput) {
     fileInput.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        // تجهيز الواجهة للرفع
         document.getElementById('loading-area').style.display = 'block';
         document.getElementById('main-content').style.display = 'none';
         
-        let dhikrIdx = 0;
-        const dhikrInterval = setInterval(() => {
-            document.getElementById('dhikr-text').innerText = dhikrs[dhikrIdx];
-            dhikrIdx = (dhikrIdx + 1) % dhikrs.length;
+        let dIdx = 0;
+        const interval = setInterval(() => {
+            document.getElementById('dhikr-text').innerText = dhikrs[dIdx];
+            dIdx = (dIdx + 1) % dhikrs.length;
         }, 4000);
 
         try {
-            // استدعاء مكتبة Gemini بطريقة مباشرة للمتصفح
+            const base64Data = await toBase64(file);
+            
+            // استدعاء Gemini API
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEN_AI_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{
                         parts: [
-                            { text: "أنت دكتور طبي تشرح لصديقك بأسلوب ممتع. اشرح الملف المرفق: تذكير (7 أسطر)، شرح الفقرات، أدوية بأسماء تجارية عراقية، فحوصات، مصطلحات، وكويز MCQ." },
-                            { inlineData: { data: await toBase64(file), mimeType: file.type } }
+                            { text: `أنت بروفيسور طبي تشرح لطلابك بأسلوب ممتع. 
+                            حلل الملف المرفق وقدم الآتي:
+                            1. قسم "الشرح": شرح مفصل وملون لكل فقرة مع ذكر الأدوية العراقية.
+                            2. قسم "المصطلحات": قائمة بالمصطلحات الطبية الجديدة وترجمتها.
+                            3. قسم "الاختبار": 5 أسئلة MCQ صعبة بنمط Case scenario.
+                            افصل بين كل قسم باستخدام العلامة ###.` },
+                            { inlineData: { data: base64Data, mimeType: file.type } }
                         ]
                     }]
                 })
             });
 
             const data = await response.json();
-            const responseText = data.candidates[0].content.parts[0].text;
+            if (!data.candidates) throw new Error("API Error");
             
-            document.getElementById('main-content').style.display = 'block';
-            const sections = responseText.split('###');
-            document.getElementById('dynamic-content').innerHTML = sections.map((s, i) => `
-                <div class="explanation-block block-${i % 3}">
-                    ${marked.parse(s)}
-                </div>
-            `).join('');
+            const fullText = data.candidates[0].content.parts[0].text;
+            processAndDisplayContent(fullText);
 
         } catch (error) {
-            alert("حدث خطأ في معالجة الملف، يرجى المحاولة لاحقاً.");
+            console.error(error);
+            alert("فشل في معالجة الملف. تأكد من إعدادات الـ API أو حجم الملف.");
         } finally {
-            clearInterval(dhikrInterval);
+            clearInterval(interval);
             document.getElementById('loading-area').style.display = 'none';
         }
     };
 }
 
-// وظيفة تحويل الملف
+// وظيفة توزيع المحتوى على التبويبات (Tabs)
+function processAndDisplayContent(text) {
+    const sections = text.split('###');
+    
+    // التبويب الأول: الشرح
+    document.getElementById('dynamic-content').innerHTML = marked.parse(sections[0] || "لم يتم توليد الشرح");
+    
+    // التبويب الثاني: المصطلحات
+    document.getElementById('terms-tab').innerHTML = marked.parse(sections[1] || "لا توجد مصطلحات مستخرجة");
+    
+    // التبويب الثالث: الكويز
+    document.getElementById('quiz-tab').innerHTML = marked.parse(sections[2] || "لا يوجد اختبار متوفر");
+    
+    document.getElementById('main-content').style.display = 'block';
+}
+
+// وظائف مساعدة
 const toBase64 = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -120,8 +134,10 @@ const toBase64 = file => new Promise((resolve, reject) => {
     reader.onerror = error => reject(error);
 });
 
-// تبديل التبويبات
 window.switchTab = (tab) => {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
     document.getElementById(`${tab}-tab`).classList.add('active');
+    event.currentTarget.classList.add('active');
 };
