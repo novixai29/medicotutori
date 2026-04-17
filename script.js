@@ -16,7 +16,7 @@ const db = firebase.firestore();
 const ADMIN_EMAIL = "musen.almajidi.alallaf@gmail.com";
 
 // 2. إعداد Gemini
-const genAI = new GoogleGenerativeAI("ضع_مفتاح_GEMINI_هنا");
+const genAI = new GoogleGenerativeAI("AQ.Ab8RN6JZC9X-JOXdOuEUL3dwzDj77OnqOKibm13gHChoEuXu9g");
 
 // عناصر الواجهة
 const loginBtn = document.getElementById('login-btn');
