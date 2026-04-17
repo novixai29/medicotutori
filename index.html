@@ -4,23 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Med Tutorial | صدقة جارية</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="light-mode">
-
     <div id="auth-overlay" class="overlay">
         <div class="auth-card">
-            <h2 style="font-weight: 700;">🩺 Med Tutorial</h2>
-            <p style="margin: 20px 0; color: #555;">السلام عليكم، هذا الموقع مجاني كصدقة جارية لأرواح أموات المسلمين جميعاً</p>
+            <h2>🩺 Med Tutorial</h2>
+            <p>السلام عليكم، هذا الموقع مجاني كصدقة جارية لأرواح أموات المسلمين جميعاً</p>
             <button id="login-btn" class="btn-primary">الدخول بحساب Google</button>
         </div>
     </div>
@@ -28,29 +23,25 @@
     <nav>
         <div class="nav-container">
             <span class="logo">Med Tutorial</span>
-            <div class="nav-btns">
-                <button id="theme-toggle" class="icon-btn">🌙</button>
-            </div>
+            <button id="theme-toggle">🌙</button>
         </div>
     </nav>
 
     <div class="container">
-        <section id="admin-panel" class="card admin-box" style="display:none; border-right: 5px solid #2ecc71;">
-            <h3 style="margin-top: 0;">🛡️ لوحة الإدارة (د. محسن المجيدي)</h3>
-            <div id="users-count">جاري تحميل إحصائيات الطلاب...</div>
+        <section id="admin-panel" class="card" style="display:none; border-right: 5px solid #ff8c00;">
+            <h3>🛡️ لوحة الإدارة (د. محسن المجيدي)</h3>
         </section>
 
         <section class="upload-section card">
             <div id="drop-zone" class="drop-zone">
                 <input type="file" id="fileInput" hidden accept=".pdf,image/*">
-                <span class="upload-icon" style="font-size: 3rem; display: block; margin-bottom: 10px;">📥</span>
-                <h3 style="margin-bottom: 20px;">ارفع المحاضرة الطبية</h3>
+                <span style="font-size: 40px;">📥</span>
+                <h3>ارفع المحاضرة الطبية</h3>
                 <button class="btn-orange" onclick="document.getElementById('fileInput').click()">اختيار الملف</button>
             </div>
-            
             <div id="loading-area" style="display:none; text-align: center; padding: 20px;">
-                <p class="dhikr-msg" style="font-weight: 600; color: #e67e22;">المسألة ما تطول، اذكر الله علما نكمل</p>
-                <div id="dhikr-text" class="dhikr-box" style="font-size: 1.3rem; margin: 15px 0; color: #d35400;">"سبحان الله وبحمده"</div>
+                <p style="color: #ff8c00; font-weight: bold;">المسألة ما تطول، اذكر الله علما نكمل</p>
+                <div id="dhikr-text" style="font-size: 1.2rem; margin-top: 10px;">"سبحان الله وبحمده"</div>
             </div>
         </section>
 
@@ -60,15 +51,11 @@
                 <button class="tab-btn" onclick="switchTab('terms')">المصطلحات</button>
                 <button class="tab-btn" onclick="switchTab('quiz')">اختبار MCQ</button>
             </div>
-
-            <div id="explanation-tab" class="tab-pane active">
-                <div id="dynamic-content"></div>
-            </div>
+            <div id="explanation-tab" class="tab-pane active"><div id="dynamic-content"></div></div>
             <div id="terms-tab" class="tab-pane card"></div>
             <div id="quiz-tab" class="tab-pane card"></div>
         </main>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
