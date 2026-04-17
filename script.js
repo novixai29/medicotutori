@@ -1,98 +1,125 @@
-// اعدادات Firebase (يجب جلبها من console.firebase.google.com)
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// 1. إعدادات Firebase
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSy...", // ضع مفتاح Firebase الخاص بك
+    authDomain: "your-app.firebaseapp.com",
+    projectId: "your-app",
+    storageBucket: "your-app.appspot.com",
+    messagingSenderId: "12345",
+    appId: "1:12345:web:abc"
 };
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+const ADMIN_EMAIL = "musen.almajidi.alallaf@gmail.com";
 
-const adminEmail = "musen.almajidi.alallaf@gmail.com";
+// 2. إعداد Gemini
+const genAI = new GoogleGenerativeAI("ضع_مفتاح_GEMINI_هنا");
+
+// عناصر الواجهة
+const loginBtn = document.getElementById('login-btn');
+const fileInput = document.getElementById('fileInput');
+const loadingArea = document.getElementById('loading-area');
+const dhikrText = document.getElementById('dhikr-text');
+const mainContent = document.getElementById('main-content');
 
 // الأذكار
-const adhkars = [
-    "اللهم انفعنا بما علمتنا وعلمنا ما ينفعنا",
-    "ربِّ زدني علماً",
-    "اللهم لا سهل إلا ما جعلته سهلاً",
-    "من سلك طريقاً يلتمس فيه علماً سهل الله له به طريقاً إلى الجنة"
+const dhikrs = [
+    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ",
+    "اللَّهُمَّ انْفَعْنِي بِمَا عَلَّمْتَنِي ، وَعَلِّمْنِي مَا يَنْفَعُنِي",
+    "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+    "رَبِّ زِدْنِي عِلْمًا"
 ];
 
-// تبديل الوضع الليلي
-document.getElementById('theme-toggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const icon = document.querySelector('#theme-toggle i');
-    icon.classList.toggle('fa-sun');
-});
-
-// تسجيل الدخول
-document.getElementById('login-btn').addEventListener('click', () => {
+// المصادقة
+loginBtn.onclick = () => {
     const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).then(result => {
-        handleUser(result.user);
-    });
-});
+    auth.signInWithPopup(provider);
+};
 
-function handleUser(user) {
+auth.onAuthStateChanged(user => {
     if (user) {
-        document.getElementById('login-btn').classList.add('hidden');
-        document.getElementById('user-info').classList.remove('hidden');
-        document.getElementById('user-name').innerText = user.displayName;
-        
-        // خزن البيانات محلياً
-        localStorage.setItem('medUser', JSON.stringify(user));
-
-        // التحقق من الأدمن
-        if (user.email === adminEmail) {
-            document.getElementById('admin-panel').classList.remove('hidden');
-            loadAdminData();
-        }
+        document.getElementById('auth-overlay').style.display = 'none';
+        if (user.email === ADMIN_EMAIL) document.getElementById('admin-panel').style.display = 'block';
+        updateUserRecord(user);
     }
-}
-
-// محاكاة معالجة الملف والذكاء الاصطناعي
-document.getElementById('process-btn').addEventListener('click', () => {
-    document.getElementById('loading-area').classList.remove('hidden');
-    let dhikrIdx = 0;
-    
-    // تغيير الأذكار كل 10 ثواني
-    const dhikrInterval = setInterval(() => {
-        document.getElementById('dhikr-display').innerText = adhkars[dhikrIdx % adhkars.length];
-        dhikrIdx++;
-    }, 5000);
-
-    setTimeout(() => {
-        clearInterval(dhikrInterval);
-        document.getElementById('loading-area').classList.add('hidden');
-        document.getElementById('result-area').classList.remove('hidden');
-        renderMockExplanation();
-    }, 5000); // محاكاة لـ 5 ثواني
 });
 
-function renderMockExplanation() {
-    const expDiv = document.getElementById('main-explanation');
-    const reviewDiv = document.getElementById('previous-review');
-    
-    reviewDiv.innerHTML = "<strong>تذكير بالمحاضرة السابقة:</strong><br>تكلمنا في المرة الماضية عن فزيولوجيا القلب وكيفية انتقال الشارة الكهربائية من الـ SA Node وصولاً للبطينات.. (تكملة 5 أسطر)";
-    
-    expDiv.innerHTML = `
-        <div class="explanation-segment">
-            <h3>1. البداية والأساسيات</h3>
-            <p>يا دكتور، الموضوع بسيط.. شوف هاي الصورة تشرح لك كيف الضغط يرتفع...</p>
-        </div>
-        <div class="explanation-segment">
-            <h3>2. الأدوية المذكورة</h3>
-            <p>الدواء المذكور هو <strong>Amlodipine</strong> واسمه التجاري المشهور (Norvasc).</p>
-        </div>
-    `;
+async function updateUserRecord(user) {
+    await db.collection('users').doc(user.uid).set({
+        name: user.displayName,
+        email: user.email,
+        lastLogin: Date.now()
+    }, { merge: true });
 }
 
-function showTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
+// معالجة الملف
+fileInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    loadingArea.style.display = 'block';
+    let dhikrIdx = 0;
+    const interval = setInterval(() => {
+        dhikrText.innerText = dhikrs[dhikrIdx];
+        dhikrIdx = (dhikrIdx + 1) % dhikrs.length;
+    }, 4000);
+
+    try {
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const filePart = await fileToGenerativePart(file);
+        
+        const prompt = `أنت دكتور وبروفيسور طبي تشرح لصديقك بأسلوب ممتع. اشرح الملف المرفق بالتفصيل:
+        1. ابدأ بتذكير شامل (8 أسطر) عن الموضوع السابق المرتبط.
+        2. شرح مرتب لكل فقرة على حدة.
+        3. اذكر الأسماء التجارية للأدوية المشهورة بالعراق.
+        4. اشرح الفحوصات الطبية المذكورة وكيفية إجرائها علمياً.
+        5. استخرج المصطلحات الصعبة في قسم منفصل.
+        6. أنشئ 5 أسئلة MCQ كيس سيناريو صعبة جداً.
+        التزم بلغة عربية فصحى مبسطة وودية.`;
+
+        const result = await model.generateContent([prompt, filePart]);
+        const response = result.response.text();
+        
+        processAndDisplay(response);
+    } catch (err) {
+        console.error(err);
+        alert("حدث خطأ في المعالجة");
+    } finally {
+        clearInterval(interval);
+        loadingArea.style.display = 'none';
+    }
+};
+
+function processAndDisplay(text) {
+    mainContent.style.display = 'block';
+    // تقسيم النص بناءً على الرموز (افتراضياً نقسم حسب العناوين)
+    const sections = text.split('###');
+    
+    const container = document.getElementById('dynamic-content');
+    container.innerHTML = sections.map((s, i) => `
+        <div class="explanation-block block-${i % 3}">
+            ${marked.parse(s)}
+        </div>
+    `).join('');
 }
+
+async function fileToGenerativePart(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve({
+            inlineData: { data: reader.result.split(',')[1], mimeType: file.type }
+        });
+        reader.readAsDataURL(file);
+    });
+}
+
+// نظام التبويبات
+window.switchTab = (tab) => {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`${tab}-tab`).classList.add('active');
+    event.target.classList.add('active');
+};
