@@ -1,95 +1,82 @@
 :root {
-    --primary-orange: #FF8C42;
-    --light-bg: #FFFFFF;
-    --dark-bg: #1A1A1A;
-    --text-main: #333;
-    --card-bg: #f9f9f9;
+    --primary: #FF8C00; /* برتقالي مريح */
+    --secondary: #FFF4E6;
+    --bg: #ffffff;
+    --text: #333;
+    --card: #ffffff;
+    --shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+body.dark-mode {
+    --bg: #121212;
+    --text: #e0e0e0;
+    --card: #1e1e1e;
+    --secondary: #2d2d2d;
 }
 
 body {
     font-family: 'Cairo', sans-serif;
-    background-color: var(--light-bg);
-    color: var(--text-main);
+    background-color: var(--bg);
+    color: var(--text);
     margin: 0;
-    transition: all 0.3s ease;
-}
-
-body.dark-mode {
-    background-color: var(--dark-bg);
-    color: #eee;
-}
-
-body.dark-mode .card {
-    background-color: #2D2D2D;
-    color: white;
-}
-
-.container { max-width: 900px; margin: auto; padding: 20px; }
-
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 5%;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.sadaqa-msg {
-    background: #fff3cd;
-    padding: 10px;
-    border-radius: 8px;
-    border-right: 5px solid var(--primary-orange);
-    font-weight: bold;
-    text-align: center;
-}
-
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-
-.btn-primary {
-    background-color: var(--primary-orange);
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.drop-zone {
-    border: 2px dashed var(--primary-orange);
-    padding: 40px;
-    text-align: center;
-    border-radius: 15px;
-    cursor: pointer;
+    direction: rtl;
     transition: 0.3s;
 }
 
-.drop-zone:hover { background: #fff5ee; }
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
 
-.dhikr-style {
-    font-style: italic;
-    color: var(--primary-orange);
-    font-size: 1.2rem;
-    margin-top: 15px;
+nav {
+    background: var(--card);
+    padding: 15px 0;
+    box-shadow: var(--shadow);
+    position: sticky; top: 0; z-index: 100;
 }
 
-.review-box {
-    background: #eef2ff;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    line-height: 1.8;
+.nav-container { display: flex; justify-content: space-between; width: 90%; margin: 0 auto; align-items: center; }
+.logo { font-weight: 700; color: var(--primary); font-size: 1.5rem; }
+
+.overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    display: flex; align-items: center; justify-content: center; z-index: 1000;
 }
 
-/* تلوين فقرات الشرح */
-.explanation-segment:nth-child(odd) { border-right: 4px solid #4A90E2; padding-right: 15px; margin-bottom: 20px; }
-.explanation-segment:nth-child(even) { border-right: 4px solid #FF8C42; padding-right: 15px; margin-bottom: 20px; }
+.auth-card {
+    background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px;
+}
 
-.hidden { display: none; }
+.card {
+    background: var(--card); border-radius: 18px; padding: 25px;
+    margin-bottom: 25px; box-shadow: var(--shadow); border: 1px solid var(--secondary);
+}
+
+.btn-primary, .btn-orange {
+    background: var(--primary); color: white; border: none;
+    padding: 12px 30px; border-radius: 10px; cursor: pointer; font-weight: 600; font-family: 'Cairo';
+}
+
+.drop-zone {
+    border: 3px dashed var(--primary); padding: 60px; text-align: center;
+    border-radius: 20px; background: var(--secondary); cursor: pointer;
+}
+
+.dhikr-box { font-size: 1.2rem; font-weight: bold; color: var(--primary); margin: 15px 0; min-height: 40px; }
+
+.explanation-block {
+    padding: 20px; border-radius: 12px; margin-bottom: 15px;
+    border-right: 6px solid var(--primary); line-height: 1.8;
+}
+
+/* تنويع ألوان الفقرات */
+.block-0 { background: #fffcf0; }
+.block-1 { background: #f0f7ff; }
+.block-2 { background: #f6fff5; }
+
+.tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+.tab-btn {
+    flex: 1; padding: 10px; border: none; border-radius: 8px;
+    cursor: pointer; background: var(--secondary); font-family: 'Cairo';
+}
+.tab-btn.active { background: var(--primary); color: white; }
+
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
