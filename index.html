@@ -20,17 +20,23 @@
 
 <body class="dark-mode">
 
+<!-- شاشة تسجيل الدخول -->
 <div id="auth-overlay" class="overlay">
-    <button id="login-btn">تسجيل الدخول</button>
+    <button id="login-btn">تسجيل الدخول بواسطة Google</button>
 </div>
 
-<div class="container">
+<!-- التطبيق (مخفي بالبداية) -->
+<div class="container" style="display:none;">
 
     <h2>Novix AI</h2>
 
     <input type="file" id="fileInput">
 
-    <div id="loading-area" style="display:none;">جاري التحليل...</div>
+    <!-- التحميل -->
+    <div id="loading-area" style="display:none;">
+        <p>جاري التحليل...</p>
+        <p id="dhikr-text"></p>
+    </div>
 
     <div id="main-content" style="display:none;">
         <div id="dynamic-tab"></div>
