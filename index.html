@@ -44,14 +44,13 @@
             <div id="drop-zone" class="drop-zone">
                 <input type="file" id="fileInput" hidden accept=".pdf,image/*">
                 <span class="upload-icon" style="font-size: 3rem; display: block; margin-bottom: 10px;">📥</span>
-                <h3 style="margin-bottom: 20px;">ارفع المحاضرة الطبية (PDF أو صورة)</h3>
+                <h3 style="margin-bottom: 20px;">ارفع المحاضرة الطبية</h3>
                 <button class="btn-orange" onclick="document.getElementById('fileInput').click()">اختيار الملف</button>
             </div>
             
             <div id="loading-area" style="display:none; text-align: center; padding: 20px;">
-                <p class="dhikr-msg" style="font-weight: 600; color: #e67e22;">المسألة ما تطول، اذكر الله علما نكمل و الله يوفقك</p>
+                <p class="dhikr-msg" style="font-weight: 600; color: #e67e22;">المسألة ما تطول، اذكر الله علما نكمل</p>
                 <div id="dhikr-text" class="dhikr-box" style="font-size: 1.3rem; margin: 15px 0; color: #d35400;">"سبحان الله وبحمده"</div>
-                <div class="loader-spinner"></div>
             </div>
         </section>
 
@@ -65,14 +64,8 @@
             <div id="explanation-tab" class="tab-pane active">
                 <div id="dynamic-content"></div>
             </div>
-
-            <div id="terms-tab" class="tab-pane card">
-                <p>المصطلحات الصعبة المستخرجة تظهر هنا...</p>
-            </div>
-
-            <div id="quiz-tab" class="tab-pane card">
-                <p>الأسئلة والاختبارات تظهر هنا...</p>
-            </div>
+            <div id="terms-tab" class="tab-pane card"></div>
+            <div id="quiz-tab" class="tab-pane card"></div>
         </main>
     </div>
 
