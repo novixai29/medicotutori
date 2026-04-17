@@ -1,48 +1,95 @@
+:root {
+    --primary-orange: #FF8C42;
+    --light-bg: #FFFFFF;
+    --dark-bg: #1A1A1A;
+    --text-main: #333;
+    --card-bg: #f9f9f9;
+}
+
 body {
-  font-family: 'Cairo', sans-serif;
-  margin:0;
-  background:white;
+    font-family: 'Cairo', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-main);
+    margin: 0;
+    transition: all 0.3s ease;
 }
 
-.dark { background:#121212; color:white; }
-
-header {
-  background:linear-gradient(45deg, orange, #ffb347);
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: #eee;
 }
 
-button {
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  background:orange;
-  cursor:pointer;
+body.dark-mode .card {
+    background-color: #2D2D2D;
+    color: white;
 }
 
-.upload, .auth {
-  margin:20px;
-  padding:15px;
-  background:#f5f5f5;
-  border-radius:10px;
+.container { max-width: 900px; margin: auto; padding: 20px; }
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.tabs {
-  display:flex;
-  gap:10px;
-  padding:10px;
+.sadaqa-msg {
+    background: #fff3cd;
+    padding: 10px;
+    border-radius: 8px;
+    border-right: 5px solid var(--primary-orange);
+    font-weight: bold;
+    text-align: center;
 }
 
-.tabContent {
-  padding:15px;
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-.hidden { display:none; }
-
-.paragraph {
-  margin:10px 0;
-  padding:12px;
-  border-radius:10px;
-  background:#fff3e0;
+.btn-primary {
+    background-color: var(--primary-orange);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
 }
+
+.drop-zone {
+    border: 2px dashed var(--primary-orange);
+    padding: 40px;
+    text-align: center;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.drop-zone:hover { background: #fff5ee; }
+
+.dhikr-style {
+    font-style: italic;
+    color: var(--primary-orange);
+    font-size: 1.2rem;
+    margin-top: 15px;
+}
+
+.review-box {
+    background: #eef2ff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+/* تلوين فقرات الشرح */
+.explanation-segment:nth-child(odd) { border-right: 4px solid #4A90E2; padding-right: 15px; margin-bottom: 20px; }
+.explanation-segment:nth-child(even) { border-right: 4px solid #FF8C42; padding-right: 15px; margin-bottom: 20px; }
+
+.hidden { display: none; }
