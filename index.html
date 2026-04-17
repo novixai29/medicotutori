@@ -1,67 +1,53 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>طبيب المستقبل | الشرح الذكي</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Med Tutorial</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <div class="header-content">
-                <h1>🩺 طبيب المستقبل</h1>
-                <p class="subtitle">شرح المحاضرات الطبية بلهجتك المفضلة</p>
-            </div>
-            <div id="user-level" class="badge">مبتدئ</div>
-        </header>
 
-        <section class="stats-grid">
-            <div class="stat-card">
-                <h3>المعدل العام</h3>
-                <p id="avg-score">0%</p>
-            </div>
-            <div class="stat-card">
-                <h3>الاختبارات المنتهية</h3>
-                <p id="total-quizzes">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>اللغة/اللّهجة</h3>
-                <p id="current-dialect">العراقية</p>
-            </div>
-        </section>
+<header>
+  <h1>Med Tutorial</h1>
+  <button id="darkModeToggle">🌙</button>
+</header>
 
-        <main id="main-content">
-            <div id="uploader-section" class="card">
-                <div class="upload-box" id="drop-zone">
-                    <span class="upload-icon">📄</span>
-                    <h3>ارفع محاضرة الـ PDF هنا</h3>
-                    <p>سيقوم الذكاء الاصطناعي بتحليلها فوراً</p>
-                    <input type="file" id="fileInput" hidden accept=".pdf">
-                    <button class="btn-primary" onclick="document.getElementById('fileInput').click()">اختر الملف</button>
-                </div>
-            </div>
+<section class="welcome">
+السلام عليكم، هذا الموقع مجاني كصدقة جارية لأرواح اموات المسلمين جميعاً
+</section>
 
-            <div id="interaction-section" class="card" style="display: none;">
-                <div class="chat-container">
-                    <div id="chat-messages" class="chat-messages">
-                        </div>
-                    <div class="input-area">
-                        <input type="text" id="userQuery" placeholder="اسأل عن أي جزء في المحاضرة...">
-                        <button class="btn-send" onclick="askGemini()">إرسال</button>
-                    </div>
-                </div>
-                <button class="btn-secondary" onclick="resetUploader()" style="margin-top: 15px;">رفع ملف آخر</button>
-            </div>
-        </main>
+<section class="auth">
+<button id="loginBtn">تسجيل الدخول گوگل</button>
+<p id="userInfo"></p>
+</section>
 
-        <section class="history-section card">
-            <h3>📜 المحاضرات السابقة</h3>
-            <ul id="lecture-list" class="lecture-list">
-                <li class="empty-msg">لا يوجد محاضرات مسجلة بعد.</li>
-            </ul>
-        </section>
-    </div>
-    <script src="script.js"></script>
+<section class="upload">
+<input type="file" id="fileInput">
+<button id="uploadBtn">رفع وشرح</button>
+</section>
+
+<section id="loading" class="hidden">
+<p>المسألة ما تطول، اذكر الله علما نكمل و الله يوفقك</p>
+<div id="azkar"></div>
+</section>
+
+<!-- Tabs -->
+<div class="tabs hidden" id="tabs">
+  <button onclick="showTab('explain')">شرح</button>
+  <button onclick="showTab('terms')">مصطلحات</button>
+  <button onclick="showTab('mcq')">اختبار</button>
+</div>
+
+<section id="explain" class="tabContent"></section>
+<section id="terms" class="tabContent hidden"></section>
+<section id="mcq" class="tabContent hidden"></section>
+
+<script src="script.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+
 </body>
 </html>
