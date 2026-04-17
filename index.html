@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طبيب المستقبل | إدارة البيانات</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🩺 لوحة تحكم طبيب المستقبل</h1>
+            <div id="user-level" class="badge">مبتدئ</div>
+        </header>
+
+        <main>
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <h3>المعدل</h3>
+                    <p id="avg-score">0%</p>
+                </div>
+                <div class="stat-card">
+                    <h3>الاختبارات</h3>
+                    <p id="total-quizzes">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>اللهجة المختارة</h3>
+                    <p id="current-dialect">العراقية</p>
+                </div>
+            </section>
+
+            <section class="action-zone">
+                <button onclick="changeDialect('Moslawi')">تحويل للهجة المصلاوية</button>
+                <button onclick="simulateUpload()" id="upload-btn">رفع محاضرة جديدة</button>
+            </section>
+
+            <section class="history">
+                <h3>المحاضرات السابقة</h3>
+                <ul id="lecture-list"></ul>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
