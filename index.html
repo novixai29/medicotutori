@@ -8,9 +8,10 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
-<body class="dark-mode"> <div id="user-profile-menu" class="user-profile-wrapper">
+<body class="dark-mode">
+
+    <div id="user-profile-menu" class="user-profile-wrapper">
         <div class="profile-icon" onclick="toggleMenu()">
             <span id="user-initials">M</span>
         </div>
@@ -49,16 +50,14 @@
         <div id="loading-area" class="loading-box" style="display: none;">
             <div class="spinner"></div>
             <p id="dhikr-text">"يا حي يا قيوم برحمتك أستغيث"</p>
-            <p class="loading-sub">جاري تحليل المحاضرة طبياً بذكاء Gemini...</p>
         </div>
 
         <main id="main-content" style="display: none;">
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('dynamic')">الشرح الطبي</button>
+                <button class="tab-btn active" onclick="switchTab('dynamic')">الشرح</button>
                 <button class="tab-btn" onclick="switchTab('terms')">المصطلحات</button>
-                <button class="tab-btn" onclick="switchTab('quiz')">اختبار MCQ</button>
+                <button class="tab-btn" onclick="switchTab('quiz')">اختبار</button>
             </div>
-            
             <div id="dynamic-tab" class="tab-pane active content-render"></div>
             <div id="terms-tab" class="tab-pane content-render"></div>
             <div id="quiz-tab" class="tab-pane content-render"></div>
