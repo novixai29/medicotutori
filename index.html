@@ -3,72 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Med Tutorial | صدقة جارية</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Novix Medical - دكتور محسن</title>
     <link rel="stylesheet" href="style.css">
-
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
-<body>
-
-    <div id="auth-overlay" class="overlay">
-        <div class="auth-card">
-            <h1 style="color: var(--primary); margin-bottom: 10px;">🩺 Med Tutorial</h1>
-            <p style="color: #666; margin-bottom: 25px;">مرحباً بك دكتور، هذا الموقع صدقة جارية مخصصة لطلاب الطب لتسهيل دراسة المحاضرات.</p>
-            <button id="login-btn" class="btn-primary">تسجيل الدخول عبر Google</button>
+<body class="dark-mode"> <div id="user-profile-menu" class="user-profile-wrapper">
+        <div class="profile-icon" onclick="toggleMenu()">
+            <span id="user-initials">M</span>
+        </div>
+        <div id="drop-menu" class="dropdown-content">
+            <p id="user-display-name"></p>
+            <hr>
+            <div class="menu-row">
+                <button onclick="toggleDarkMode()" title="تبديل الوضع الليلي">
+                    <span id="mode-icon">☀️</span> الوضع المضيء
+                </button>
+            </div>
+            <button onclick="switchAccount()">🔄 تبديل الحساب</button>
+            <button onclick="signOut()" class="logout-btn">📤 تسجيل الخروج</button>
         </div>
     </div>
 
-    <nav>
-        <div class="nav-container">
-            <span class="logo">MED TUTORIAL</span>
-            <div id="user-info" style="color: white; font-size: 0.9rem;"></div>
+    <div id="auth-overlay" class="overlay">
+        <div class="login-card">
+            <h1 style="color: #ff9800;">Novix Medical</h1>
+            <p>مرحباً بك دكتور.. يرجى تسجيل الدخول للبدء</p>
+            <button id="login-btn" class="btn-primary">الدخول بواسطة Google</button>
         </div>
-    </nav>
+    </div>
 
-    <div class="container">
-        <section id="admin-panel" class="card" style="display:none; background: #fffcf0;">
-            <h3 style="color: #e67e22; margin-top: 0;">🛡️ لوحة التحكم (د. محسن)</h3>
-            <p id="users-count" style="font-size: 0.9rem;">أهلاً بك في نظامك الخاص.</p>
-        </section>
+    <div class="container" id="app-container">
+        <header>
+            <h2 class="brand-title">Novix <span>AI</span></h2>
+            <p class="subtitle">مساعدك الذكي في تحليل المحاضرات الطبية</p>
+        </header>
 
-        <section class="upload-section card">
-            <div id="drop-zone" class="drop-zone" onclick="document.getElementById('fileInput').click()">
-                <input type="file" id="fileInput" hidden accept=".pdf,image/*">
-                <div class="upload-icon" style="font-size: 50px; margin-bottom: 15px;">📄</div>
-                <h3 style="margin: 0;">اضغط هنا لرفع المحاضرة</h3>
-                <p style="color: #888; font-size: 0.9rem; margin-top: 10px;">يدعم ملفات PDF والصور الطبية</p>
-            </div>
-            
-            <div id="loading-area" style="display:none;">
-                <div class="dhikr-box" id="dhikr-text">"يا حي يا قيوم برحمتك أستغيث"</div>
-                <p style="text-align: center; color: var(--primary); font-weight: bold;">جاري تحليل المحاضرة طبياً بذكاء Gemini...</p>
-            </div>
-        </section>
+        <div class="upload-section">
+            <label for="fileInput" class="upload-label">
+                <div class="upload-icon">📄</div>
+                <span>ارفع المحاضرة (صورة أو PDF)</span>
+                <input type="file" id="fileInput" hidden accept="image/*,.pdf">
+            </label>
+        </div>
 
-        <main id="main-content" style="display:none;">
+        <div id="loading-area" class="loading-box" style="display: none;">
+            <div class="spinner"></div>
+            <p id="dhikr-text">جاري التحليل.. اذكر الله</p>
+        </div>
+
+        <main id="main-content" style="display: none;">
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('explanation')">💡 الشرح التفصيلي</button>
-                <button class="tab-btn" onclick="switchTab('terms')">📖 المصطلحات</button>
-                <button class="tab-btn" onclick="switchTab('quiz')">📝 اختبار MCQ</button>
+                <button class="tab-btn active" onclick="switchTab('dynamic')">الشرح</button>
+                <button class="tab-btn" onclick="switchTab('terms')">المصطلحات</button>
+                <button class="tab-btn" onclick="switchTab('quiz')">الاختبار</button>
             </div>
-
-            <div id="explanation-tab" class="tab-pane active card">
-                <div id="dynamic-content">
-                    </div>
+            <div id="dynamic-tab" class="tab-pane active">
+                <div id="dynamic-content" class="content-render"></div>
             </div>
-
-            <div id="terms-tab" class="tab-pane card">
-                </div>
-
-            <div id="quiz-tab" class="tab-pane card">
-                </div>
+            <div id="terms-tab" class="tab-pane content-render"></div>
+            <div id="quiz-tab" class="tab-pane content-render"></div>
         </main>
     </div>
 
